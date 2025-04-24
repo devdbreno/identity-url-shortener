@@ -1,0 +1,35 @@
+# General
+.env
+
+# Node.js
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Yarn Berry (v2+)
+.pnp.*
+.yarn/*
+yarn.lock
+.yarn/cache
+!.yarnrc.yml
+!.yarn/sdks/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/versions/
+
+# TypeScript
+*.tsbuildinfo
+out/
+dist/
+coverage/
+test_output/
+
+# NestJS
+*.js
+*.d.ts
+*.map
+
+# IDEs
+.idea/
+.vscode/

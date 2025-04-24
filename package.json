@@ -1,0 +1,18 @@
+{
+  "name": "identity-url-shortener-monorepo",
+  "packageManager": "yarn@4.9.1",
+  "scripts": {
+    "build": "yarn workspaces foreach --all --parallel run build",
+    "start": "concurrently \"yarn start:identity\" \"yarn start:url\"",
+    "start:dev": "concurrently \"yarn workspace identity-service start:dev\" \"yarn workspace url-service start:dev\"",
+    "start:url": "yarn workspace url-service start",
+    "start:identity": "yarn workspace identity-service start",
+    "test": "yarn workspaces run test"
+  },
+  "workspaces": [
+    "services/*"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
