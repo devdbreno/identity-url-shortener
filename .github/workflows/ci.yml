@@ -1,14 +1,33 @@
 name: CI
 on: [push, pull_request]
+
+env:
+  node_version: "22.14.0"
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Enable Corepack
+        uses: actions/setup-node@v4
         with:
-          node-version: "22.14.0"
+          node-version: ${{ env.node_version }}
+
+      - name: Set up Yarn
+        run: |
+          corepack enable
+          yarn set version stable
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
           cache: "yarn"
-      - run: corepack enable && yarn set version stable
-      - run: yarn install --immutable
-      - run: yarn test
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run tests
+        run: yarn test
