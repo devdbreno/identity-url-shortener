@@ -13,32 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
-    
+        node-version: [22.14.0]
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2      
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
-      - name: Install Yarn
-        run: |
-          corepack enable
-          corepack prepare yarn@stable --activate
+          cache: "yarn"
+
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
+
       - name: Run tests
         run: yarn test
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            .yarn/cache
-            .yarn/unplugged
-            .yarn/install-state.gz
-            .pnp.*
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
