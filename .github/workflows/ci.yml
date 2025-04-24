@@ -10,24 +10,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Enable Corepack
+      # Initial setup to enable Corepack
+      - name: Setup Node.js and Corepack
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
 
-      - name: Set up Yarn
+      # Configure Yarn Berry with smart lockfile handling
+      - name: Initialize Yarn Berry
         run: |
           corepack enable
           yarn set version stable
 
-      - name: Setup Node.js with cache
+          # Check for existing lockfile
+          if [ -f "yarn.lock" ] || [ -f ".yarn/install-state.gz" ]; then
+            echo "Lockfile found - using immutable install"
+            yarn install --immutable
+          else
+            echo "No lockfile found - generating new one"
+            yarn install
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git add yarn.lock .yarn/install-state.gz
+            git commit -m "chore: update yarn lockfile" || echo "No changes to commit"
+          fi
+
+      # Cache setup
+      - name: Configure Node.js caching
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --immutable
 
       - name: Run tests
         run: yarn test
