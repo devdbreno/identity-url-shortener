@@ -8,6 +8,8 @@
     "start:url": "yarn workspace @monorepo/short-url-service start",
     "start:identity": "yarn workspace @monorepo/identity-service start",
     "test": "yarn workspaces foreach --all --parallel run test",
+    "lint": "yarn workspaces foreach --all --parallel run lint",
+    "format": "yarn workspaces foreach --all --parallel run format",
     "prepare": "husky",
     "prepush": "yarn test",
     "precommit": "yarn workspaces foreach --all --parallel run lint-staged"
