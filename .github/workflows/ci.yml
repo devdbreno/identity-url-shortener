@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+<<<<<<< HEAD
       # First setup just to enable Corepack
       - name: Enable Corepack
         uses: actions/setup-node@v4
@@ -21,6 +22,9 @@ jobs:
 
       # Second setup with caching
       - name: Setup Node.js with cache
+=======
+      - name: Setup Node and Yarn
+>>>>>>> 21ce1bdbcf3b21b0663f717485e1218bb1accef1
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
@@ -28,8 +32,14 @@ jobs:
 
       - name: Install dependencies
         run: |
+<<<<<<< HEAD
           yarn set version stable
           yarn install --immutable
+=======
+          corepack enable
+          yarn set version stable
+          yarn install
+>>>>>>> 21ce1bdbcf3b21b0663f717485e1218bb1accef1
 
       - name: Run tests
         run: yarn test
