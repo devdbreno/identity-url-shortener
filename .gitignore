@@ -29,6 +29,7 @@ test_output/
 *.js
 *.d.ts
 *.map
+!/services/types/**
 
 # IDEs
 .idea/
