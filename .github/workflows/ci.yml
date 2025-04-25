@@ -10,34 +10,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Corepack setup
       - name: Enable Corepack
         run: corepack enable
 
-      # 2. Node.js setup with cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           cache: "yarn"
+          cache-dependency-path: |
+            .yarn/cache/**/*.zip
+            yarn.lock
+            .yarnrc.yml
 
-      # 3. Yarn Berry initialization (fixed config commands)
-      - name: Prepare Yarn
+      - name: Prepare Yarn Berry
         run: |
           yarn set version 4.9.1
-          yarn config set checksumBehavior --json '"ignore"'
-          yarn config set enableImmutableInstalls --json false
+          yarn config set enableGlobalCache true
+          yarn config set compressionLevel 0
 
-      # 4. Install dependencies
       - name: Install dependencies
-        run: |
-          if [ -f "yarn.lock" ]; then
-            echo "Validating lockfile..."
-            yarn install --immutable
-          else
-            echo "Generating lockfile..."
-            yarn install
-          fi
+        run: yarn install --immutable
 
       - name: Run tests
         run: yarn test
