@@ -10,31 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Corepack first
-      - name: Enable Corepack
-        run: corepack enable
-
-      # Then setup Node.js with cache
-      - name: Setup Node.js
+      - name: Setup Node and Yarn
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           cache: "yarn"
 
-      # Install Yarn Berry
-      - name: Initialize Yarn
-        run: yarn set version stable
-
-      # Conditional lockfile handling
       - name: Install dependencies
         run: |
-          if [ -f "yarn.lock" ] || [ -f ".yarn/install-state.gz" ]; then
-            echo "Lockfile found - using immutable install"
-            yarn install --immutable
-          else
-            echo "No lockfile found - creating with update-lockfile"
-            yarn install --mode=update-lockfile
-          fi
+          corepack enable
+          yarn set version stable
+          yarn install
 
       - name: Run tests
         run: yarn test
