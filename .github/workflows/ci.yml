@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  node_version: "22.14.0"
+  node_version: 22.14.0
 
 jobs:
   test:
@@ -10,27 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node.js
+      - name: Setup Node.js & Cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
-          cache: "yarn"
+          cache: yarn
           cache-dependency-path: |
             .yarn/cache/**/*.zip
             yarn.lock
             .yarnrc.yml
 
-      - name: Prepare Yarn Berry
+      - name: Install & Test
         run: |
-          yarn set version 4.9.1
-          yarn config set enableGlobalCache true
-          yarn config set compressionLevel 0
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Run tests
-        run: yarn test
+          yarn install --immutable
+          yarn test
