@@ -1,18 +1,18 @@
-# Etapa 1 - Build
+# Building
 FROM node:22.14.0-alpine AS builder
 
 WORKDIR /app
 
 COPY . .
 
-# Ativa Corepack e instala com Yarn 4 conforme definido no package.json
-RUN corepack enable && yarn install --frozen-lockfile
+# Enable corepack and install dependencies
+RUN corepack enable && yarn install --immutable
 
 WORKDIR /app/services/identity-service
 
 RUN yarn build
 
-# Etapa 2 - Runtime
+# Runtime
 FROM node:22.14.0-alpine
 
 WORKDIR /app
