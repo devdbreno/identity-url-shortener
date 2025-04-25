@@ -10,17 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable corepack
+        run: corepack enable
+
       - name: Setup Node.js & Cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           cache: yarn
-          cache-dependency-path: |
-            .yarn/cache/**/*.zip
-            yarn.lock
-            .yarnrc.yml
 
-      - name: Install & Test
-        run: |
-          yarn install --immutable
-          yarn test
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run tests
+        run: yarn test

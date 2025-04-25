@@ -3,8 +3,8 @@
   "packageManager": "yarn@4.9.1",
   "scripts": {
     "build": "yarn workspaces foreach --all --parallel run build",
-    "start": "concurrently \"yarn start:identity\" \"yarn start:url\"",
-    "start:dev": "concurrently \"yarn workspace @monorepo/identity-service start:dev\" \"yarn workspace @monorepo/short-url-service start:dev\"",
+    "start": "yarn workspaces foreach --all --parallel run start",
+    "start:dev": "yarn workspaces foreach --all --parallel run start:dev",
     "start:url": "yarn workspace @monorepo/short-url-service start",
     "start:identity": "yarn workspace @monorepo/identity-service start",
     "test": "yarn workspaces foreach --all --parallel run test",
