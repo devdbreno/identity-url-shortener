@@ -11,6 +11,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # 1. Corepack setup
+      # 1. Corepack setup
       - name: Enable Corepack
         run: corepack enable
 
@@ -22,6 +23,7 @@ jobs:
           cache: "yarn"
 
       # 3. Yarn Berry initialization (fixed config commands)
+      # 3. Yarn Berry initialization (fixed config commands)
       - name: Prepare Yarn
         run: |
           yarn set version 4.9.1
@@ -29,12 +31,16 @@ jobs:
           yarn config set checksumBehavior --json '"ignore"'
 
       # 4. Install dependencies
+      # 4. Install dependencies
       - name: Install dependencies
         run: |
           if [ -f "yarn.lock" ]; then
             echo "Validating lockfile..."
             yarn install --immutable
+            echo "Validating lockfile..."
+            yarn install --immutable
           else
+            echo "Generating lockfile..."
             echo "Generating lockfile..."
             yarn install
           fi
