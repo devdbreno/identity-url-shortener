@@ -10,26 +10,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # First setup just to enable Corepack
+      # Corepack setup must come first
       - name: Enable Corepack
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.node_version }}
-
-      - name: Initialize Yarn
         run: corepack enable
 
-      # Second setup with caching
-      - name: Setup Node.js with cache
+      # Node.js setup with caching
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           cache: "yarn"
 
+      # Yarn Berry initialization
+      - name: Prepare Yarn
+        run: yarn set version stable
+
+      # Smart install with lockfile handling
       - name: Install dependencies
         run: |
-          yarn set version stable
-          yarn install --frozen-lockfile
+          if [ -f "yarn.lock" ]; then
+            echo "Using existing lockfile"
+            yarn install --immutable
+          else
+            echo "Generating new lockfile"
+            yarn config set enableImmutableInstalls false
+            yarn install
+          fi
 
       - name: Run tests
         run: yarn test
