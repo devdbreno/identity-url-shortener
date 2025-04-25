@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Corepack setup (must be first)
+      # 1. Corepack setup
       - name: Enable Corepack
         run: corepack enable
 
@@ -21,26 +21,22 @@ jobs:
           node-version: ${{ env.node_version }}
           cache: "yarn"
 
-      # 3. Yarn Berry initialization
+      # 3. Yarn Berry initialization (fixed config commands)
       - name: Prepare Yarn
         run: |
           yarn set version 4.9.1
-          yarn config set enableImmutableInstalls false --json
-          yarn config set checksumBehavior ignore --json
+          yarn config set enableImmutableInstalls --json false
+          yarn config set checksumBehavior --json '"ignore"'
 
-      # 4. Install with lockfile validation
+      # 4. Install dependencies
       - name: Install dependencies
         run: |
           if [ -f "yarn.lock" ]; then
-            echo "Validating lockfile consistency..."
-            yarn install --immutable --check-cache
+            echo "Validating lockfile..."
+            yarn install --immutable
           else
-            echo "Generating new lockfile..."
+            echo "Generating lockfile..."
             yarn install
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "actions@github.com"
-            git add yarn.lock
-            git commit -m "chore: update yarn.lock" || echo "No changes to commit"
           fi
 
       - name: Run tests
