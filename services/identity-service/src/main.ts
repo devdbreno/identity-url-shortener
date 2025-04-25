@@ -29,4 +29,4 @@ async function bootstrap() {
   await microApp.listen();
 }
 
-bootstrap();
+void bootstrap();
