@@ -4,8 +4,8 @@
   "scripts": {
     "build": "yarn workspaces foreach --all --parallel run build",
     "start": "concurrently \"yarn start:identity\" \"yarn start:url\"",
-    "start:dev": "concurrently \"yarn workspace identity-service start:dev\" \"yarn workspace url-service start:dev\"",
-    "start:url": "yarn workspace url-service start",
+    "start:dev": "concurrently \"yarn workspace identity-service start:dev\" \"yarn workspace short-url-service start:dev\"",
+    "start:url": "yarn workspace short-url-service start",
     "start:identity": "yarn workspace identity-service start",
     "test": "yarn workspaces foreach --all --parallel run test"
   },

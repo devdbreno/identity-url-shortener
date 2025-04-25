@@ -35,10 +35,10 @@ services:
     ports:
       - "${DB_URL_SHORTENER_PORT:-5434}:5432"
 
-  url-service:
+  short-url-service:
     build:
       context: .
-      dockerfile: Dockerfile.url-service
+      dockerfile: Dockerfile.short-url-service
     env_file:
       - .env
     environment:

@@ -5,7 +5,7 @@
 Este monorepo contém dois serviços NestJS:
 
 - **identity-service**: registro e login de usuários com JWT.
-- **url-service**: criação e gestão de URLs encurtadas, contabilização de cliques.
+- **short-url-service**: criação e gestão de URLs encurtadas, contabilização de cliques.
 
 Arquitetura em camadas (Clean Architecture):
 
