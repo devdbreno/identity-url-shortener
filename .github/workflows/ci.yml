@@ -1,4 +1,5 @@
 name: CI
+
 on: [push, pull_request]
 
 env:
@@ -7,6 +8,36 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres-identity:
+        image: postgres:14
+        env:
+          POSTGRES_DB: identity_db
+          POSTGRES_USER: identity_user
+          POSTGRES_PASSWORD: identity_password
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready -U identity_user -d identity_db
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres-url:
+        image: postgres:14
+        env:
+          POSTGRES_DB: url_shortener_db
+          POSTGRES_USER: url_shortener_user
+          POSTGRES_PASSWORD: url_shortener_password
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd pg_isready -U url_shortener_user -d url_shortener_db
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,5 +56,21 @@ jobs:
       - name: Run lint & format
         run: yarn lint && yarn format
 
-      - name: Run tests
-        run: yarn test
+      - name: Run unit tests
+        run: yarn test:unit
+
+      - name: Build and run services with docker-compose
+        run: docker-compose up -d --build
+
+      - name: Wait for services to be ready
+        run: |
+          npx wait-on http://localhost:4000
+          npx wait-on http://localhost:4001
+          npx wait-on tcp:localhost:4002
+
+      - name: Run E2E tests
+        run: yarn test:e2e
+
+      - name: Shutdown docker-compose
+        if: always()
+        run: docker-compose down

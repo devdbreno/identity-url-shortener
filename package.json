@@ -4,14 +4,16 @@
   "scripts": {
     "build": "yarn workspaces foreach --all --parallel run build",
     "start": "yarn workspaces foreach --all --parallel run start",
-    "start:dev": "yarn workspaces foreach --all --parallel run start:dev",
     "start:url": "yarn workspace @monorepo/short-url-service start",
-    "start:identity": "yarn workspace @monorepo/identity-service start",
+    "start:url:dev": "yarn workspace @monorepo/short-url-service start:dev",
+    "start:identity:dev": "yarn workspace @monorepo/identity-service start:dev",
+    "start:dev": "concurrently --names \"identity,short-url\" --prefix-colors \"blue,green\" \"yarn workspace @monorepo/identity-service start:dev\" \"yarn workspace @monorepo/short-url-service start:dev\"",
     "test": "yarn workspaces foreach --all --parallel run test",
+    "test:unit": "yarn workspaces foreach --all --parallel run test:unit",
     "lint": "yarn workspaces foreach --all --parallel run lint",
     "format": "yarn workspaces foreach --all --parallel run format",
     "prepare": "husky",
-    "prepush": "yarn test",
+    "prepush": "yarn test:unit",
     "precommit": "yarn workspaces foreach --all --parallel run lint-staged"
   },
   "workspaces": [

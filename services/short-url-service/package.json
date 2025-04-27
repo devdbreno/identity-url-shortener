@@ -6,8 +6,9 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" --no-error-on-unmatched-pattern",
-    "test": "jest --passWithNoTests"
+    "format": "prettier --write src/**/*.ts",
+    "test": "jest --passWithNoTests",
+    "test:cov": "jest --coverage"
   },
   "lint-staged": {
     "*.{ts,js}": [
@@ -70,24 +71,39 @@
   "jest": {
     "moduleFileExtensions": [
       "js",
-      "json",
-      "ts"
+      "ts",
+      "json"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "testPathIgnorePatterns": [
+      "<rootDir>/main.ts",
+      "<rootDir>/presentation/app.module.ts"
+    ],
+    "testMatch": [
+      "**/?(*.)+(e2e-spec|spec-unit).ts"
+    ],
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.ts",
+      "!**/*.module.ts",
+      "!<rootDir>/main.ts",
+      "!<rootDir>/presentation/app.module.ts"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "@swc/core"
-    ]
+    "coveragePathIgnorePatterns": [
+      ".mock.ts$",
+      ".module.ts$",
+      "<rootDir>/main.ts",
+      "<rootDir>/presentation/app.module.ts"
+    ],
+    "moduleNameMapper": {
+      "@infra/(.*)$": "<rootDir>/infra/$1",
+      "@domain/(.*)$": "<rootDir>/domain/$1",
+      "@application/(.*)$": "<rootDir>/application/$1",
+      "@presentation/(.*)$": "<rootDir>/presentation/$1"
+    }
   }
 }

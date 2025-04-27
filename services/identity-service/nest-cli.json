@@ -1,6 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
+  "monorepo": true,
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
-  "compilerOptions": { "deleteOutDir": true }
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
 }

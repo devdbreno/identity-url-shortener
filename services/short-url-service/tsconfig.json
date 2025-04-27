@@ -9,10 +9,19 @@
     "incremental": true,
     "skipLibCheck": true,
     "removeComments": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@infra/*": ["src/infra/*"],
+      "@domain/*": ["src/domain/*"],
+      "@application/*": ["src/application/*"],
+      "@presentation/*": ["src/presentation/*"]
+    }
   },
-  "include": ["src/**/*", "../types/**/*"]
+  "include": ["src/**/*", "../types/**/*"],
+  "exclude": ["dist", "node_modules", "eslint.config.mjs"]
 }
