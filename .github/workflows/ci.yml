@@ -71,9 +71,13 @@ jobs:
         timeout-minutes: 10
         env:
           DB_IDENTITY_HOST: localhost
+          DB_IDENTITY_NAME: ${{ env.DB_IDENTITY_NAME }}
           DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
+          DB_IDENTITY_PASSWORD: ${{ env.DB_IDENTITY_PASSWORD }}
           DB_URL_SHORTENER_HOST: localhost
+          DB_URL_SHORTENER_NAME: ${{ env.DB_URL_SHORTENER_NAME }}
           DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
+          DB_URL_SHORTENER_PASSWORD: ${{ env.DB_URL_SHORTENER_PASSWORD }}
         run: |
           yarn lint
           yarn format
