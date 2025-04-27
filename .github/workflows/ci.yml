@@ -4,6 +4,8 @@ on: [push, pull_request]
 
 env:
   node_version: 22.14.0
+  POSTGRES_IDENTITY_PORT: 5433
+  POSTGRES_URL_SHORTENER_PORT: 5434
 
 jobs:
   test:
@@ -17,7 +19,7 @@ jobs:
           POSTGRES_USER: identity_user
           POSTGRES_PASSWORD: identity_password
         ports:
-          - 5433:5432
+          - ${{ env.POSTGRES_IDENTITY_PORT }}:5432
         options: >-
           --health-cmd "pg_isready -U identity_user -d identity_db"
           --health-interval 10s
@@ -31,7 +33,7 @@ jobs:
           POSTGRES_USER: url_shortener_user
           POSTGRES_PASSWORD: url_shortener_password
         ports:
-          - 5434:5432
+          - ${{ env.POSTGRES_URL_SHORTENER_PORT }}:5432
         options: >-
           --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
           --health-interval 10s
@@ -39,12 +41,16 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment file
+        run: cp .env.example .env
 
       - name: Enable corepack
         run: corepack enable
 
-      - name: Setup Node.js & Cache
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
@@ -53,21 +59,28 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Run lint & format
+      - name: Lint and format
         run: yarn lint && yarn format
 
-      - name: Run unit tests
+      - name: Unit tests
         run: yarn test:unit
 
-      - name: Wait for PostgreSQL services
-        timeout-minutes: 5
+      - name: Wait for databases
+        timeout-minutes: 2
         run: |
-          npx wait-on tcp:localhost:5433  # postgres-identity
-          npx wait-on tcp:localhost:5434  # postgres-url
+          npx wait-on tcp:localhost:${{ env.POSTGRES_IDENTITY_PORT }}
+          npx wait-on tcp:localhost:${{ env.POSTGRES_URL_SHORTENER_PORT }}
 
       - name: Run E2E tests
+        env:
+          DB_IDENTITY_HOST: localhost
+          DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
+          DB_URL_SHORTENER_HOST: localhost
+          DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
         run: yarn test:e2e
 
-      - name: Shutdown services
+      - name: Cleanup
         if: always()
-        run: docker compose down
+        run: |
+          docker compose down --remove-orphans
+          rm -f .env
