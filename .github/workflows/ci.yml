@@ -59,18 +59,21 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
-      - name: Build and run services with docker compose
-        run: docker compose up -d --build
+      - name: Build and run services with docker-compose
+        run: docker-compose -f ./docker-compose.yml up -d --build
 
       - name: Wait for services to be ready
         run: |
-          npx wait-on http://localhost:4000
-          npx wait-on http://localhost:4001
-          npx wait-on tcp:localhost:4002
+          npx wait-on http://localhost:4000   # Wait identity-service HTTP
+          npx wait-on http://localhost:4001   # Wait short-url-service HTTP
+          npx wait-on tcp:localhost:4002      # Wait identity-service TCP
 
       - name: Run E2E tests
         run: yarn test:e2e
 
-      - name: Shutdown docker compose
+      - name: Shutdown docker-compose
         if: always()
-        run: docker compose down
+        run: |
+          echo "Current dir: $(pwd)"
+          ls -la
+          docker-compose -f ./docker-compose.yml down

@@ -24,4 +24,4 @@ COPY --from=builder /app/services/identity-service/package.json ./
 EXPOSE 4000
 EXPOSE 4002
 
-CMD ["node", "dist"]
+CMD ["node", "dist/main"]

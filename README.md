@@ -53,19 +53,28 @@ This repository is a monorepo for a scalable and modular URL Shortener platform,
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/devdbreno/identity-url-shortener.git
+   |> git clone https://github.com/devdbreno/identity-url-shortener.git
 
-   cd identity-url-shortener
+   |> cd identity-url-shortener
+
+   |> cp .env.example .env
+
+   |> yarn install
    ```
 
-## 🧪 Running Tests
+## 🧪 Running Tests Units/E2E together
 
 ### Example for identity-service
 
 ```bash
-cd services/identity-service
+# Bring up only the docker database containers
+|> docker compose down
 
-yarn test
+|> docker compose up postgres-url postgres-identity -d --build
+
+|> cd services/identity-service
+
+|> yarn test
 ```
 
 ### Example for short-url-service
