@@ -49,11 +49,25 @@ jobs:
       - name: Setup environment file
         run: cp .env.example .env
 
-      - name: Load .env
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Verify databases
+        timeout-minutes: 2
         run: |
-          set -a
-          source .env
-          set +a
+          echo "Checking identity_db..."
+          psql -h localhost -p ${{ env.POSTGRES_IDENTITY_PORT }} \
+            -U identity_user \
+            -d identity_db \
+            -c "SELECT 1" \
+            --no-password
+
+          echo "Checking url_shortener_db..."
+          psql -h localhost -p ${{ env.POSTGRES_URL_SHORTENER_PORT }} \
+            -U url_shortener_user \
+            -d url_shortener_db \
+            -c "SELECT 1" \
+            --no-password
 
       - name: Enable corepack
         run: corepack enable
@@ -71,13 +85,9 @@ jobs:
         timeout-minutes: 10
         env:
           DB_IDENTITY_HOST: localhost
-          DB_IDENTITY_NAME: ${{ env.DB_IDENTITY_NAME }}
           DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
-          DB_IDENTITY_PASSWORD: ${{ env.DB_IDENTITY_PASSWORD }}
           DB_URL_SHORTENER_HOST: localhost
-          DB_URL_SHORTENER_NAME: ${{ env.DB_URL_SHORTENER_NAME }}
           DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
-          DB_URL_SHORTENER_PASSWORD: ${{ env.DB_URL_SHORTENER_PASSWORD }}
         run: |
           yarn lint
           yarn format
