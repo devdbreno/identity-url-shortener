@@ -110,3 +110,33 @@ docker-compose up --build
 - Both services provide API documentation available at `/api-docs`:
   - Identity Service: [http://localhost:4000/api-docs](http://localhost:4000/api-docs)
   - URL Shortener Service: [http://localhost:4001/api-docs](http://localhost:4001/api-docs)
+
+## 📬 Postman Collection
+
+You can find the Postman collection for the APIs of this project at the following link:
+
+[Postman Collection](https://cloudy-meadow-983638.postman.co/workspace/Team-Workspace~72e47a74-9b28-413d-8c77-bc2424abcdcc/collection/9680139-4278aed1-0f36-4cbe-bf0b-9281234fe11d?action=share&creator=9680139&active-environment=9680139-cdf992de-67f5-418a-a12d-558a94c6a2d1)
+
+---
+
+## 🚀 Future Improvements
+
+Here are some potential improvements to enhance the project:
+
+1. **Test Coverage**:
+
+   - Increase test coverage for the `short-url-service` to ensure reliability and robustness.
+
+2. **Metrics System**:
+
+   - Implement a metrics system (e.g., Prometheus, Grafana) to monitor service performance and usage.
+
+3. **Logging and Tracing**:
+
+   - Introduce structured logging and distributed tracing (e.g., using tools like Elasticsearch, Kibana, and OpenTelemetry) to improve debugging and observability.
+
+4. **Code Quality Enhancements**:
+   - Analyze and apply design patterns or refactoring techniques to improve code quality and maintainability.
+   - Perform regular code reviews to ensure adherence to clean architecture principles.
+
+These improvements will help make the project more scalable, maintainable, and production-ready.
