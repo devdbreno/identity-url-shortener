@@ -22,5 +22,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/services/identity-service/package.json ./
 
 EXPOSE 4000
+EXPOSE 4002
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist"]

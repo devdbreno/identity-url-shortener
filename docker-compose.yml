@@ -9,20 +9,17 @@ services:
       - pgdata_identity:/var/lib/postgresql/data
     ports:
       - "${DB_IDENTITY_PORT:-5433}:5432"
-
-  identity-service:
-    build:
-      context: .
-      dockerfile: Dockerfile.identity-service
-    env_file:
-      - .env
-    environment:
-      - DB_IDENTITY_PORT=${DB_DOCKER_IDENTITY_PORT}
-      - DB_IDENTITY_HOST=${DB_DOCKER_IDENTITY_HOST}
-    ports:
-      - "${PORT_IDENTITY:-4000}:4000"
-    depends_on:
-      - postgres-identity
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_IDENTITY_USER} -d ${DB_IDENTITY_NAME}",
+        ]
+      retries: 5
+      timeout: 5s
+      interval: 5s
 
   postgres-url:
     image: postgres:14
@@ -34,6 +31,36 @@ services:
       - pgdata_url:/var/lib/postgresql/data
     ports:
       - "${DB_URL_SHORTENER_PORT:-5434}:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_URL_SHORTENER_USER} -d ${DB_URL_SHORTENER_NAME}",
+        ]
+      retries: 5
+      timeout: 5s
+      interval: 5s
+
+  identity-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.identity-service
+    env_file:
+      - .env
+    environment:
+      - DB_IDENTITY_PORT=${DB_DOCKER_IDENTITY_PORT}
+      - DB_IDENTITY_HOST=${DB_DOCKER_IDENTITY_HOST}
+      - HOST_IDENTITY_TCP=${HOST_IDENTITY_TCP_DOCKER}
+    ports:
+      - "${PORT_IDENTITY:-4000}:4000"
+      - "${PORT_IDENTITY_TCP}:4002"
+    depends_on:
+      postgres-identity:
+        condition: service_healthy
+    networks:
+      - app-network
 
   short-url-service:
     build:
@@ -44,10 +71,19 @@ services:
     environment:
       - DB_URL_SHORTENER_HOST=${DB_DOCKER_URL_SHORTENER_HOST}
       - DB_URL_SHORTENER_PORT=${DB_DOCKER_URL_SHORTENER_PORT}
+      - HOST_IDENTITY_TCP=${HOST_IDENTITY_TCP_DOCKER}
     ports:
       - "${PORT_URL_SHORTENER:-4001}:4001"
     depends_on:
-      - postgres-url
+      postgres-url:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   pgdata_url:
   pgdata_identity:

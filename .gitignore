@@ -26,7 +26,6 @@ coverage/
 test_output/
 
 # NestJS
-*.js
 *.d.ts
 *.map
 !/services/types/**
