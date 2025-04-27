@@ -24,7 +24,7 @@ jobs:
           --health-cmd "pg_isready -U identity_user -d identity_db"
           --health-interval 5s
           --health-timeout 3s
-          --health-retries 10
+          --health-retries 15
           --health-start-period 10s
 
       postgres-url:
@@ -39,7 +39,7 @@ jobs:
           --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
           --health-interval 5s
           --health-timeout 3s
-          --health-retries 10
+          --health-retries 15
           --health-start-period 10s
 
     steps:
@@ -61,16 +61,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Verify services
-        timeout-minutes: 5
-        run: |
-          echo "Waiting for PostgreSQL services..."
-          yarn wait-on -t 300000 \
-            tcp:localhost:${{ env.POSTGRES_IDENTITY_PORT }} \
-            tcp:localhost:${{ env.POSTGRES_URL_SHORTENER_PORT }}
-
       - name: Run tests
         timeout-minutes: 10
+        env:
+          DB_IDENTITY_HOST: localhost
+          DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
+          DB_URL_SHORTENER_HOST: localhost
+          DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
         run: |
           yarn lint
           yarn format
@@ -79,6 +76,4 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: |
-          docker compose down --remove-orphans
-          rm -f .env
+        run: docker compose down --remove-orphans
