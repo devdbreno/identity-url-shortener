@@ -19,7 +19,7 @@ jobs:
         ports:
           - 5433:5432
         options: >-
-          --health-cmd pg_isready -U identity_user -d identity_db
+          --health-cmd "pg_isready -U identity_user -d identity_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -33,7 +33,7 @@ jobs:
         ports:
           - 5434:5432
         options: >-
-          --health-cmd pg_isready -U url_shortener_user -d url_shortener_db
+          --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -59,21 +59,15 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
-      - name: Build and run services with docker compose
-        run: docker compose up postgres-url postgres-identity -d --build
-
-      - name: Wait for services to be ready
+      - name: Wait for PostgreSQL services
+        timeout-minutes: 5
         run: |
-          npx wait-on http://localhost:4000   # Wait identity-service HTTP
-          npx wait-on http://localhost:4001   # Wait short-url-service HTTP
-          npx wait-on tcp:localhost:4002      # Wait identity-service TCP
+          npx wait-on tcp:localhost:5433  # postgres-identity
+          npx wait-on tcp:localhost:5434  # postgres-url
 
       - name: Run E2E tests
         run: yarn test:e2e
 
-      - name: Shutdown docker compose
+      - name: Shutdown services
         if: always()
-        run: |
-          echo "Current dir: $(pwd)"
-          ls -la
-          docker compose down
+        run: docker compose down
