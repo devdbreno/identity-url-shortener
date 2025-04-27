@@ -1,11 +1,6 @@
-name: CI
+name: CI Pipeline
 
 on: [push, pull_request]
-
-env:
-  node_version: 22.14.0
-  POSTGRES_IDENTITY_PORT: 5433
-  POSTGRES_URL_SHORTENER_PORT: 5434
 
 jobs:
   test:
@@ -13,34 +8,32 @@ jobs:
 
     services:
       postgres-identity:
-        image: postgres:14
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: identity_db
           POSTGRES_USER: identity_user
           POSTGRES_PASSWORD: identity_password
         ports:
-          - ${{ vars.POSTGRES_IDENTITY_PORT }}:5432
+          - 5433:5432
         options: >-
-          --health-cmd "pg_isready -U identity_user -d identity_db"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 15
-          --health-start-period 10s
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
       postgres-url:
-        image: postgres:14
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: url_shortener_db
           POSTGRES_USER: url_shortener_user
           POSTGRES_PASSWORD: url_shortener_password
         ports:
-          - ${{ vars.POSTGRES_URL_SHORTENER_PORT }}:5432
+          - 5434:5432
         options: >-
-          --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 15
-          --health-start-period 10s
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -52,30 +45,13 @@ jobs:
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Verify databases
-        timeout-minutes: 2
-        run: |
-          echo "Checking identity_db..."
-          psql -h localhost -p ${{ env.POSTGRES_IDENTITY_PORT }} \
-            -U identity_user \
-            -d identity_db \
-            -c "SELECT 1" \
-            --no-password
-
-          echo "Checking url_shortener_db..."
-          psql -h localhost -p ${{ env.POSTGRES_URL_SHORTENER_PORT }} \
-            -U url_shortener_user \
-            -d url_shortener_db \
-            -c "SELECT 1" \
-            --no-password
-
       - name: Enable corepack
         run: corepack enable
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.node_version }}
+          node-version: 22.14.0
           cache: yarn
 
       - name: Install dependencies
@@ -85,9 +61,15 @@ jobs:
         timeout-minutes: 10
         env:
           DB_IDENTITY_HOST: localhost
-          DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
+          DB_IDENTITY_PORT: 5433
+          DB_IDENTITY_NAME: identity_db
+          DB_IDENTITY_USER: identity_user
+          DB_IDENTITY_PASSWORD: identity_password
           DB_URL_SHORTENER_HOST: localhost
-          DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
+          DB_URL_SHORTENER_PORT: 5434
+          DB_URL_SHORTENER_NAME: url_shortener_db
+          DB_URL_SHORTENER_USER: url_shortener_user
+          DB_URL_SHORTENER_PASSWORD: url_shortener_password
         run: |
           yarn lint
           yarn format
