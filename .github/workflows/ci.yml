@@ -19,12 +19,13 @@ jobs:
           POSTGRES_USER: identity_user
           POSTGRES_PASSWORD: identity_password
         ports:
-          - ${{ vars.POSTGRES_IDENTITY_PORT }}:5432 # Alterado para vars
+          - ${{ vars.POSTGRES_IDENTITY_PORT }}:5432
         options: >-
           --health-cmd "pg_isready -U identity_user -d identity_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 10s
 
       postgres-url:
         image: postgres:14
@@ -33,12 +34,13 @@ jobs:
           POSTGRES_USER: url_shortener_user
           POSTGRES_PASSWORD: url_shortener_password
         ports:
-          - ${{ vars.POSTGRES_URL_SHORTENER_PORT }}:5432 # Alterado para vars
+          - ${{ vars.POSTGRES_URL_SHORTENER_PORT }}:5432
         options: >-
           --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 10s
 
     steps:
       - name: Checkout code
@@ -59,25 +61,21 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Lint and format
-        run: yarn lint && yarn format
-
-      - name: Unit tests
-        run: yarn test:unit
-
-      - name: Wait for databases
-        timeout-minutes: 2
+      - name: Verify services
+        timeout-minutes: 5
         run: |
-          npx wait-on tcp:localhost:${{ env.POSTGRES_IDENTITY_PORT }}
-          npx wait-on tcp:localhost:${{ env.POSTGRES_URL_SHORTENER_PORT }}
+          echo "Waiting for PostgreSQL services..."
+          yarn wait-on -t 300000 \
+            tcp:localhost:${{ env.POSTGRES_IDENTITY_PORT }} \
+            tcp:localhost:${{ env.POSTGRES_URL_SHORTENER_PORT }}
 
-      - name: Run E2E tests
-        env:
-          DB_IDENTITY_HOST: localhost
-          DB_IDENTITY_PORT: ${{ env.POSTGRES_IDENTITY_PORT }}
-          DB_URL_SHORTENER_HOST: localhost
-          DB_URL_SHORTENER_PORT: ${{ env.POSTGRES_URL_SHORTENER_PORT }}
-        run: yarn test:e2e
+      - name: Run tests
+        timeout-minutes: 10
+        run: |
+          yarn lint
+          yarn format
+          yarn test:unit
+          yarn test:e2e
 
       - name: Cleanup
         if: always()
