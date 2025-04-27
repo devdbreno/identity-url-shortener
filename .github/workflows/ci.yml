@@ -60,7 +60,7 @@ jobs:
         run: yarn test:unit
 
       - name: Build and run services with docker compose
-        run: docker compose -f ./docker-compose.yml up -d --build
+        run: docker compose up postgres-url postgres-identity -d --build
 
       - name: Wait for services to be ready
         run: |
@@ -76,4 +76,4 @@ jobs:
         run: |
           echo "Current dir: $(pwd)"
           ls -la
-          docker compose -f ./docker-compose.yml down
+          docker compose down
