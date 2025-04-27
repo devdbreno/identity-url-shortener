@@ -49,6 +49,12 @@ jobs:
       - name: Setup environment file
         run: cp .env.example .env
 
+      - name: Load .env
+        run: |
+          set -a
+          source .env
+          set +a
+
       - name: Enable corepack
         run: corepack enable
 
