@@ -7,30 +7,18 @@ import { UpdateShortUrlOriginDTO } from 'src/presentation/dto/update-short-url-o
 
 @Injectable()
 export class UpdateShortUrlOriginUseCase {
-  constructor(
-    @Inject(URL_REPOSITORY) private readonly urlRepo: IUrlRepository,
-  ) {}
+  constructor(@Inject(URL_REPOSITORY) private readonly urlRepo: IUrlRepository) {}
 
-  public async execute(
-    userId: string,
-    shortCode: string,
-    updateShortUrlOriginDTO: UpdateShortUrlOriginDTO,
-  ) {
-    const shortUrl = await this.urlRepo.findByShortCodeAndUserId(
-      shortCode,
-      userId,
-    );
+  public async execute(userId: string, shortCode: string, updateShortUrlOriginDTO: UpdateShortUrlOriginDTO) {
+    const shortUrl = await this.urlRepo.findByShortCodeAndUserId(shortCode, userId);
 
     if (!shortUrl || shortUrl.deletedAt) {
-      throw new NotFoundException('URL encurtada não encontrada ou inativa!');
+      throw new NotFoundException('Shortened URL not found or inactive!');
     }
 
     shortUrl.origin = updateShortUrlOriginDTO.origin;
 
-    const shortUrlUpdated = await this.urlRepo.updateOrigin(
-      shortUrl.id,
-      updateShortUrlOriginDTO.origin,
-    );
+    const shortUrlUpdated = await this.urlRepo.updateOrigin(shortUrl.id, shortUrl.origin, userId, shortCode);
 
     return shortUrlUpdated;
   }

@@ -11,7 +11,7 @@ export class Result<T> {
     return new Result<T>(true, value);
   }
 
-  public static fail<T>(error: AppError): Result<T> {
+  public static fail<T = undefined>(error: AppError): Result<T> {
     return new Result<T>(false, undefined, error);
   }
 }

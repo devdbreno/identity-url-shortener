@@ -15,4 +15,4 @@ import databaseConfig from './db.config';
   ],
   exports: [NestConfigModule],
 })
-export class ConfigModule {}
+export class AppConfigModule {}

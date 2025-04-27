@@ -10,7 +10,6 @@ export class IdentityOptionalJwtTcpGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest<Request>();
     const authHeader = req.headers['authorization'] as string;
 
-    // Se não veio header, não valida e segue adiante sem req.user
     if (!authHeader) {
       return true;
     }

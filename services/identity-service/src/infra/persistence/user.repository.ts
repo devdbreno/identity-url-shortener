@@ -16,13 +16,10 @@ export class UserRepository implements IUserRepository {
     const orm = this.repo.create(data);
     const saved = await this.repo.save(orm);
 
-    return new User(
-      saved.id,
-      saved.email,
-      saved.passwordHash,
-      saved.createdAt,
-      saved.updatedAt,
-    );
+    return new User(saved.id, saved.email, saved.passwordHash, saved.createdAt, saved.updatedAt);
+  }
+  public async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 
   public async findByEmail(email: string): Promise<User | null> {
@@ -30,26 +27,16 @@ export class UserRepository implements IUserRepository {
 
     if (!found) return null;
 
-    return new User(
-      found.id,
-      found.email,
-      found.passwordHash,
-      found.createdAt,
-      found.updatedAt,
-    );
+    return new User(found.id, found.email, found.passwordHash, found.createdAt, found.updatedAt);
   }
 
   public async findById(id: string): Promise<User | null> {
     const found = await this.repo.findOne({ where: { id } });
 
-    if (!found) return null;
+    if (!found) {
+      return null;
+    }
 
-    return new User(
-      found.id,
-      found.email,
-      found.passwordHash,
-      found.createdAt,
-      found.updatedAt,
-    );
+    return new User(found.id, found.email, found.passwordHash, found.createdAt, found.updatedAt);
   }
 }

@@ -1,10 +1,5 @@
 import { Request, Response } from 'express';
-import {
-  ApiOperation,
-  ApiBearerAuth,
-  ApiResponse,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiBearerAuth, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
   Get,
   Req,
@@ -44,18 +39,6 @@ export class UrlController {
     private readonly updateShortUrlOriginUseCase: UpdateShortUrlOriginUseCase,
   ) {}
 
-  @Get(':urlShortCode')
-  public async redirect(
-    @Res() res: Response,
-    @Param('urlShortCode', ShortCodeValidationPipe) urlShortCode: string,
-  ) {
-    const shortUrl = await this.redirectUrlUseCase.execute(urlShortCode);
-
-    await this.redirectUrlUseCase.trackVisit(shortUrl.id);
-
-    return res.redirect(302, shortUrl.origin);
-  }
-
   @Get('short-urls')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Lists URLs shortened by the user.' })
@@ -81,10 +64,7 @@ export class UrlController {
   })
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @UseGuards(IdentityOptionalJwtTcpGuard)
-  public async shorten(
-    @Req() req: Request,
-    @Body() { origin }: CreateShortUrlDTO,
-  ) {
+  public async shorten(@Req() req: Request, @Body() { origin }: CreateShortUrlDTO) {
     return await this.createShortUrlUseCase.execute(origin, req.user?.id);
   }
 
@@ -109,6 +89,7 @@ export class UrlController {
       updateShortUrlOriginDTO,
     );
 
+    console.log('updatedShortUrl', updatedShortUrl);
     return updatedShortUrl;
   }
 
@@ -124,12 +105,18 @@ export class UrlController {
     description: 'Shortened URL not found or already deleted.',
   })
   @UseGuards(IdentityJwtTcpGuard)
-  public async softDelete(
-    @Req() req: Request,
-    @Param('urlShortCode', ShortCodeValidationPipe) urlShortCode: string,
-  ) {
+  public async softDelete(@Req() req: Request, @Param('urlShortCode', ShortCodeValidationPipe) urlShortCode: string) {
     await this.softDeleteShortUrlUseCase.execute(req.user.id, urlShortCode);
 
     return { message: 'Shortened URL successfully deleted.' };
+  }
+
+  @Get(':urlShortCode')
+  public async redirect(@Res() res: Response, @Param('urlShortCode', ShortCodeValidationPipe) urlShortCode: string) {
+    const shortUrl = await this.redirectUrlUseCase.execute(urlShortCode);
+
+    await this.redirectUrlUseCase.trackVisit(shortUrl.id);
+
+    return res.redirect(302, shortUrl.origin);
   }
 }

@@ -2,23 +2,20 @@ import { customAlphabet } from 'nanoid';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { URL_REPOSITORY } from '../constants';
-import { IUrlRepository } from '../../domain/repositories/url.repository';
+import { IUrlRepository } from 'src/domain/repositories/url.repository';
 
-const nanoid = customAlphabet(
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-  6,
-);
+const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', 6);
 
 @Injectable()
 export class CreateShortUrlUseCase {
-  constructor(
-    @Inject(URL_REPOSITORY) private readonly urlRepo: IUrlRepository,
-  ) {}
+  constructor(@Inject(URL_REPOSITORY) private readonly urlRepo: IUrlRepository) {}
 
-  async execute(origin: string, userId?: string | null) {
+  public async execute(origin: string, userId?: string | null) {
     const shortCode = await this.generateUniqueShortCode();
 
-    return await this.urlRepo.create(origin, shortCode, userId);
+    const result = await this.urlRepo.create(origin, shortCode, userId);
+
+    return result;
   }
 
   private async generateUniqueShortCode(): Promise<string> {

@@ -17,10 +17,7 @@ import { UpdateShortUrlOriginUseCase } from 'src/application/use-cases/update-sh
 @Module({
   imports: [
     IdentityModule,
-    PersistenceModule.forFeature(
-      [UrlOrm],
-      [{ provide: URL_REPOSITORY, useClass: UrlRepository }],
-    ),
+    PersistenceModule.forFeature([UrlOrm], [{ provide: URL_REPOSITORY, useClass: UrlRepository }]),
   ],
   providers: [
     ListUrlsUseCase,
