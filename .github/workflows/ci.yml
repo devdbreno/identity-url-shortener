@@ -59,8 +59,8 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
-      - name: Build and run services with docker-compose
-        run: docker-compose up -d --build
+      - name: Build and run services with docker compose
+        run: docker compose up -d --build
 
       - name: Wait for services to be ready
         run: |
@@ -71,6 +71,6 @@ jobs:
       - name: Run E2E tests
         run: yarn test:e2e
 
-      - name: Shutdown docker-compose
+      - name: Shutdown docker compose
         if: always()
-        run: docker-compose down
+        run: docker compose down
