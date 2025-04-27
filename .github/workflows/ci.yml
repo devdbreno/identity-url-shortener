@@ -19,7 +19,7 @@ jobs:
           POSTGRES_USER: identity_user
           POSTGRES_PASSWORD: identity_password
         ports:
-          - ${{ env.POSTGRES_IDENTITY_PORT }}:5432
+          - ${{ vars.POSTGRES_IDENTITY_PORT }}:5432 # Alterado para vars
         options: >-
           --health-cmd "pg_isready -U identity_user -d identity_db"
           --health-interval 10s
@@ -33,7 +33,7 @@ jobs:
           POSTGRES_USER: url_shortener_user
           POSTGRES_PASSWORD: url_shortener_password
         ports:
-          - ${{ env.POSTGRES_URL_SHORTENER_PORT }}:5432
+          - ${{ vars.POSTGRES_URL_SHORTENER_PORT }}:5432 # Alterado para vars
         options: >-
           --health-cmd "pg_isready -U url_shortener_user -d url_shortener_db"
           --health-interval 10s
